@@ -1,11 +1,10 @@
 # fault-tollerance_tic-tac-toe
 Network (fault-tollerance) tic-tac-toe
 
-server   - based on epoll()
-client   - based on poll()
-graphics - based on psedo-graphics
-
-supported os - Linux
+  - server   - based on epoll()
+  - client   - based on poll()
+  - graphics - based on psedo-graphics
+  - supported os - Linux
 
 to run: make
 
@@ -16,4 +15,4 @@ to run: make
 ./client
 
 
-Developers: Markov V.A, Samoilov D.I, Sibsutis 2016.
+Developed by Vlad Markov and Denis Samoylov, SibSUTIS 2016.
