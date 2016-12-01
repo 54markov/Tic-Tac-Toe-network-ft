@@ -3,7 +3,7 @@
 
 enum MSG { AUTH, GAME, CHAT, RESR, EVN };	// enumeration of messages
 enum ACT { YES, NO };                   	// enumeration of actions
-enum MRK { ZERO, CROSS, EMPTY, FULL };  	// enumeration of marks: 
+enum MRK { ZERO, CROSS, EMPTY, FULL, DRAW };// enumeration of marks: 
                                         	//   - valid of players and game_filed
 enum SST { MAIN, RESERVE };					// enumeration of server state
 enum EVN { TECH_WIN, LOST_CONN, UPD };			// enumeration of events

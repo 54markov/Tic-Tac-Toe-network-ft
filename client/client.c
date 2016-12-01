@@ -71,7 +71,7 @@ int try_to_connect(int server_fd, int mode)
             switch(mode)
             {
                 case 0: // branch new connection
-                    printf("connected to %s:%d\n",SERVER_IP,CONF_LIST[i]);
+                    printf("connected to %s:%d\n",SERVER_IP, CONF_LIST[i]);
                     msg.type = AUTH;  
                     msg.auth.new_game = YES;
                     write(server_fd, &msg, sizeof(msg));
@@ -95,7 +95,7 @@ int try_to_connect(int server_fd, int mode)
                     break;
                 
                 default:
-                 break;
+                    break;
             }
             break;
         }
@@ -112,18 +112,21 @@ int try_to_connect(int server_fd, int mode)
 
 int main(int argc, char const *argv[])
 {
-    struct pollfd fdt[1]; // poll 
-    struct sockaddr_in server_addr; // server structure
-
-    SERVER_FD = try_to_connect(SERVER_FD, 0); // try to connect
-
-    if (SERVER_FD == -1) {
-        return -1;
+    if (argc < 2) {
+        fprintf(stderr, "usage: %s [single]/[multiplayer]\n", argv[0]);
+        return 0;
     }
 
-    game_session(SERVER_FD, 1);
-
-    close(SERVER_FD);
+    if (strcmp(argv[1], "single") == 0) {
+        single_game_session();
+    } else if (strcmp(argv[1], "multiplayer") == 0) {
+        SERVER_FD = try_to_connect(SERVER_FD, 0);
+        if (SERVER_FD == -1) {
+            return -1;
+        }
+        game_session(SERVER_FD, 1);
+        close(SERVER_FD);
+    }
 
     return 0;
 }

@@ -552,15 +552,14 @@ int game_session(int server_fd, int isGameBegan)
 
         int unused;
         pthread_create(&networking, 0, ctlNetworking, (void*)&unused);
-        //pthread_create(&chatInteraction, 0, ctlChatInteraction, (void*)&unused);
 
         int whoWin;
         char msgSign[250];
 
         if (chPlayer == 1) {
-            mi_writeMessage("Вы играете ноликами");
+            mi_writeMessage("You are ZERO");
         } else if (chPlayer == 2) {
-            mi_writeMessage("Вы играете крестиками");
+            mi_writeMessage("You are CROSS");
         }
 
         while (isFinishedGame == 0 && rk_readkey(&key) == 0 && key != K_ESC) {
@@ -654,9 +653,9 @@ int game_session(int server_fd, int isGameBegan)
                             whoWin = mi_gamePlay();
                             mi_winGame(whoWin);
                         } else if (gameState[rowField][colField] != 0){
-                            mi_writeMessage("Место занято!");
+                            mi_writeMessage("This cell is taken!");
                         } else if (previousMove == 1) {
-                            mi_writeMessage("Ход крестиков!");
+                            mi_writeMessage("CROSS move!");
                         }
                     }
                     break;
@@ -680,17 +679,15 @@ int game_session(int server_fd, int isGameBegan)
                             whoWin = mi_gamePlay();
                             mi_winGame(whoWin);
                         } else if (gameState[rowField][colField] != 0){
-                            mi_writeMessage("Место занято!");
+                            mi_writeMessage("This cell is taken!");
                         } else if (previousMove == 2) {
-                            mi_writeMessage("Ход ноликов!");
+                            mi_writeMessage("ZERO move!");
                         }
                     }
                     break;
             }
         }
         pthread_cancel(networking);
-        //pthread_cancel(chatInteraction);
         close(server_fd);
-        //close(chatSocket);
     }
 }
