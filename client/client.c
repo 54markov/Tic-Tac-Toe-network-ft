@@ -112,20 +112,26 @@ int try_to_connect(int server_fd, int mode)
 
 int main(int argc, char const *argv[])
 {
-    if (argc < 2) {
-        fprintf(stderr, "usage: %s [single]/[multiplayer]\n", argv[0]);
-        return 0;
-    }
 
-    if (strcmp(argv[1], "single") == 0) {
-        single_game_session();
-    } else if (strcmp(argv[1], "multiplayer") == 0) {
-        SERVER_FD = try_to_connect(SERVER_FD, 0);
-        if (SERVER_FD == -1) {
-            return -1;
+    switch (menu_session())
+    {
+        case 0:
+            single_game_session();
+            break;
+
+        case 1:
+        {
+            SERVER_FD = try_to_connect(SERVER_FD, 0);
+            if (SERVER_FD == -1) {
+                return -1;
+            }
+            game_session(SERVER_FD, 1);
+            close(SERVER_FD);
         }
-        game_session(SERVER_FD, 1);
-        close(SERVER_FD);
+            break;
+
+        case 2:
+            break;
     }
 
     return 0;

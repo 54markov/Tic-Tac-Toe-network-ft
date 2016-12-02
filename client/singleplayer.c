@@ -30,6 +30,7 @@ int gameField[3][3] = { { EMPTY, EMPTY, EMPTY },
                         { EMPTY, EMPTY, EMPTY },
                         { EMPTY, EMPTY, EMPTY } };
 
+int is_finished_game = 0;
 int previous_player_move = EMPTY;
 
 pthread_mutex_t game_mutex;
@@ -52,7 +53,6 @@ void* ctlAiInteraction(void *arg)
     while(1) {
         sleep(1);
         try_to_make_move_ai(chPlayer);
-        sleep(1);
     }
 
     return 0;
@@ -272,9 +272,7 @@ void drawGameField(int ROW, int COL)
 }
 
 int try_to_make_move(int rowField, int colField, int player)
-{
-    int isWin = 0;
-    
+{    
     lock_gameField();
 
     if (gameField[rowField][colField] == EMPTY && previous_player_move != player) {
@@ -283,7 +281,7 @@ int try_to_make_move(int rowField, int colField, int player)
         drawGameField(rowField, colField);   // отрисовываем интерфейс заново
        
         // проверяем на выигрышную ситуацию (другой клиент проерит в своей потоке)
-        isWin = winGame(gamePlay(gameField));
+        is_finished_game = winGame(gamePlay(gameField));
 
     } else if (gameField[rowField][colField] != EMPTY){
         mi_writeMessage("This place is taken!");
@@ -293,7 +291,7 @@ int try_to_make_move(int rowField, int colField, int player)
 
     unlock_gameField();
 
-    return isWin;
+    return 0;
 }
 
 void try_to_make_move_ai(int player)
@@ -311,6 +309,9 @@ void try_to_make_move_ai(int player)
             }
         }
     }
+
+    is_finished_game = winGame(gamePlay(gameField));
+
     unlock_gameField();
 }
 
@@ -318,7 +319,6 @@ void try_to_make_move_ai(int player)
 int single_game_session()
 {
     int key;
-    int isFinishedGame = 0;
     int chPlayer = ZERO;
 
     pthread_t ai_player;
@@ -354,7 +354,7 @@ int single_game_session()
         mi_writeMessage("You are playing CROSSES");
     }
 
-    while (isFinishedGame == 0 && rk_readkey(&key) == 0 && key != K_ESC) {
+    while (is_finished_game == 0 && rk_readkey(&key) == 0 && key != K_ESC) {
         switch (key) 
         {
             case K_R:
@@ -394,43 +394,14 @@ int single_game_session()
                 break;
                 
             case K_ENTER:
-                if (chPlayer == 1) {
-                    strcpy(msgSign,"ZEROS: ");
-                } else if (chPlayer == 2) {
-                    strcpy(msgSign, "CROSSES: ");
-                }
-                
-                for (int i = 0; i < 250; i++) {
-                    msgChat[i] = '\0';
-                }
-                
-                bc_box(37, 1, 3, 101);
-                mt_gotoXY(37, 2);
-                write(1, " WRITE IN CHAT: ", 16);
-                mt_gotoXY(38, 2);
-                rk_mytermrestore();
-                mt_setcursor(1);
-                    
-                len = read(0, msgChat, sizeof(msgChat));
-                msgChat[len - 1] = '\0';
-                if (len > 45) {
-                    clearAreaEnterMsg(37, 1, 3, 101);
-                    break;
-                }
-                
-                strcat(msgSign, msgChat);
-                displayMsgChat(msgSign);
-                clearAreaEnterMsg(37, 1, 3, 101);
-                rk_mytermregime(0, 0, 1, 0, 1);
-                mt_setcursor(0);
                 break;
 
             case K_F5: // place ZERO
-                isFinishedGame = try_to_make_move(rowField, colField, chPlayer);
+                try_to_make_move(rowField, colField, chPlayer);
                 break;
                 
             case K_F6: // place CROSS
-                isFinishedGame = try_to_make_move(rowField, colField, chPlayer);
+                try_to_make_move(rowField, colField, chPlayer);
                 break;
         }
     }
@@ -443,4 +414,151 @@ int single_game_session()
     mt_gotoXY(39, 1);
 
     return 0;
+}
+
+void draw_main_menu()
+{
+    int tty; /* хранит номер дескриптора */
+    tty = open("/dev/tty", O_RDWR); /* открытие файла терминала в режиме чтение/запись */
+    if (tty == -1) { /* проверка на открытие */
+        fprintf(stderr, "\nmi_drawMainInterface()\n: Can not open tty\n");
+        close(tty);
+        return;
+    }
+    mt_clrscr();
+    mt_setbgcolor(clBlack);
+    mt_setfgcolor(clGreen);
+
+    bc_box(1, 1, 18, 46);
+
+    bc_box(2, 3, 5, 42);
+
+    mt_setfgcolor(clYellow);
+    bc_box(7, 3, 5, 42);
+    mt_setfgcolor(clGreen);
+
+    bc_box(12, 3, 5, 42);
+
+    mt_gotoXY(4, 6);
+    write(tty, " SINGLEPLAYER ", 14);
+    
+    mt_setfgcolor(clYellow);
+    mt_gotoXY(9, 6);
+    write(tty, " MULTIPLAYER ", 13);
+    mt_setfgcolor(clGreen);
+
+    mt_gotoXY(14, 6);
+    write(tty, " EXIT ", 6);
+
+    return;
+}
+
+void draw_main_menu_field(int row)
+{
+    int tty; /* хранит номер дескриптора */
+    tty = open("/dev/tty", O_RDWR); /* открытие файла терминала в режиме чтение/запись */
+    if (tty == -1) { /* проверка на открытие */
+        fprintf(stderr, "\nmi_drawMainInterface()\n: Can not open tty\n");
+        close(tty);
+        return;
+    }
+
+    if (row == 0) {
+        mt_setfgcolor(clYellow);
+        bc_box(2, 3, 5, 42);
+        mt_gotoXY(4, 6);
+        write(tty, " SINGLEPLAYER ", 14);
+
+        mt_setfgcolor(clGreen);
+        bc_box(7, 3, 5, 42);
+        bc_box(12, 3, 5, 42);
+        mt_gotoXY(9, 6);
+        write(tty, " MULTIPLAYER ", 13); 
+        mt_gotoXY(14, 6);
+        write(tty, " EXIT ", 6);
+    } else if (row == 1) {
+        mt_setfgcolor(clYellow);
+        bc_box(7, 3, 5, 42);
+        mt_gotoXY(9, 6);
+        write(tty, " MULTIPLAYER ", 13);
+        
+        mt_setfgcolor(clGreen);
+        bc_box(2, 3, 5, 42);
+        bc_box(12, 3, 5, 42);
+        mt_gotoXY(4, 6);
+        write(tty, " SINGLEPLAYER ", 14);
+        mt_gotoXY(14, 6);
+        write(tty, " EXIT ", 6);
+    } else {
+        mt_setfgcolor(clYellow);
+        bc_box(12, 3, 5, 42);
+        mt_gotoXY(14, 6);
+        write(tty, " EXIT ", 6);
+        
+        mt_setfgcolor(clGreen);
+        bc_box(2, 3, 5, 42);
+        bc_box(7, 3, 5, 42);
+        mt_gotoXY(4, 6);
+        write(tty, " SINGLEPLAYER ", 14);
+        mt_gotoXY(9, 6);
+        write(tty, " MULTIPLAYER ", 13);
+    }
+}
+
+int menu_session()
+{
+    int key;
+    int run_flag = -1;
+    int rowField = 1;
+
+    // Draw main part of interface
+    draw_main_menu();
+
+    // Save terminal settings, change mode, hide cursor
+    rk_mytermsave();
+    rk_mytermregime(0, 0, 1, 0, 1);
+    mt_setcursor(0);
+
+    // Setup color palete
+    mt_setbgcolor(clBlack);
+    mt_setfgcolor(clGreen);
+
+    while (rk_readkey(&key) == 0 && key != K_ESC) {
+        switch (key) 
+        {     
+            case K_UP:
+                if (rowField != 0) {
+                    rowField--;
+                    draw_main_menu_field(rowField);
+                }
+                break;
+                
+            case K_DOWN:
+                if (rowField != 2) {
+                    rowField++;
+                    draw_main_menu_field(rowField);
+                }
+                break;
+      
+            case K_ENTER:
+                if (rowField == 0) {
+                    run_flag = 0;
+                } else if (rowField == 1) {
+                    run_flag = 1;
+                } else {
+                    run_flag = 2;
+                }
+                break;
+        }
+        if (key == K_ENTER) {
+            break;
+        }
+    }
+    rk_mytermrestore();
+    mt_setcursor(1);
+    mt_setstdcolor();
+    mt_gotoXY(39, 1);
+    mt_clrscr();
+
+    return run_flag;
 }

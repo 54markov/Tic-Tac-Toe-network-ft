@@ -31,4 +31,46 @@
 #define NUM_SERVER 3 		 // Amount of server
 #define SERVER_IP "127.0.0.1"// Local host adrress
 
+
+#include "header.h"
+
+// библиотеки для рисования интерфейса считывания клавиш
+#include "../lib/graphics/myTerm.h"
+#include "../lib/graphics/myBigChars.h"
+#include "../lib/graphics/myReadKey.h"
+
+#include <errno.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <strings.h>
+#include <sys/epoll.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <pthread.h>
+
+#include <signal.h> // для обработки сигнала прерывания
+
+#include <sys/poll.h>
+
+#include "../lib/message.h"
+
+void lock_gameField();
+void unlock_gameField();
+void* ctlAiInteraction(void *arg);
+int gamePlay(int gameState[3][3]);
+int winGame(int winner);
+void drawGameField(int ROW, int COL);
+int try_to_make_move(int rowField, int colField, int player);
+void try_to_make_move_ai(int player);
+int single_game_session();
+int menu_session();
+
+
+
 #endif
