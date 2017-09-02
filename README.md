@@ -9,4 +9,4 @@ HOWTO:
 * run server - ./server [port] [state] (port : 2345, 2346, 2347: state: 0-main, 1-reserve)
 * run cline - ./client
 
-# Developed by Vlad Markov and Denis Samoylov, SibSUTIS 2016.
+### Developed by Vlad Markov and Denis Samoylov, SibSUTIS 2016.
