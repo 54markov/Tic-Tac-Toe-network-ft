@@ -1,18 +1,12 @@
-# fault-tollerance_tic-tac-toe
-Network (fault-tollerance) tic-tac-toe
+#  Network Fault Tollerance Tic-Tac-Toe
+Features:
+* Server - based on epoll()
+* Client - based on poll()
+* Graphics - based on psedo-graphics
+* Supported os - Linux
+HOWTO:
+* build - make
+* run server - ./server [port] [state] (port : 2345, 2346, 2347: state: 0-main, 1-reserve)
+* run cline - ./client
 
-  - server   - based on epoll()
-  - client   - based on poll()
-  - graphics - based on psedo-graphics
-  - supported os - Linux
-
-to run: make
-
-./server [port] [state]
-  - port : 2345, 2346, 2347
-  - state: 0-main, 1-reserve
-
-./client
-
-
-Developed by Vlad Markov and Denis Samoylov, SibSUTIS 2016.
+## Developed by Vlad Markov and Denis Samoylov, SibSUTIS 2016.
