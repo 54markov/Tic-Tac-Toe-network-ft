@@ -1,6 +1,6 @@
 #  Network Fault Tollerance Tic-Tac-Toe
 
-###Features:
+### Features:
 * Server part - based on epoll()
 * Client part - based on poll()
 * Graphics part - based on psedo-graphics
