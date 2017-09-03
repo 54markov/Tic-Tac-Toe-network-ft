@@ -4,7 +4,7 @@
 * Server part - based on epoll()
 * Client part - based on poll()
 * Graphics part - based on psedo-graphics
-* Supported os - Linux
+* Supported OS - GNU/Linux
 
 ### Usage:
 * build - make
